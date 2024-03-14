@@ -1,39 +1,32 @@
 import streamlit as st
 import os
 import io
-from PIL import Image
 from dotenv import load_dotenv
 load_dotenv()
-import base64
-import pdf2image
 import google.generativeai as genai
+import PyPDF2 as pdf
+
+
 
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
-def get_gemini_response(input_text, pdf_content, prompt):
-    model = genai.GenerativeModel('gemini-pro-vision')
-    response = model.generate_content([input_text, pdf_content[0], prompt])
+def get_gemini_response(input_text, pdf_text, prompt):
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content([input_text, pdf_text, prompt])
     return response.text
 
 
 def input_pdf_setup(uploaded_file):
-    if uploaded_file is not None:
-        images = pdf2image.convert_from_bytes(uploaded_file.read())
-        first_page = images[0]
+  if uploaded_file is not None:
+      pdf_reader = pdf.PdfReader(uploaded_file)
+      pdf_text = ""
+      for page_num in range(len(pdf_reader.pages)):
+          page = pdf_reader.pages[page_num]
+          pdf_text += page.extract_text()
 
-        img_byte_arr = io.BytesIO()
-        first_page.save(img_byte_arr, format='JPEG')
-        img_byte_arr = img_byte_arr.getvalue()
-
-        pdf_parts = [
-            {
-                "mime_type": "image/jpeg",
-                "data": base64.b64encode(img_byte_arr).decode()
-            }
-        ]
-        return pdf_parts
-    else:
+      return pdf_text
+  else:
         raise FileNotFoundError("No file uploaded")
 
 
@@ -69,9 +62,9 @@ if selected_tab == "HR":
     def show_response_hr(buttons, input_prompts):
         if buttons["submit1"] and uploaded_file is not None:
             with st.spinner("Generating response..."):  # Added progress bar
-                pdf_content = input_pdf_setup(uploaded_file)
+                pdf_text = input_pdf_setup(uploaded_file)
                 try:
-                    response = get_gemini_response(input_prompts["HR_Summary"], pdf_content, input_text)
+                    response = get_gemini_response(input_prompts["HR_Summary"], pdf_text, input_text)
                 except KeyError:
                     st.error("Prompt for 'Resume Summary' not found. Please check the code.")
                     return
@@ -80,9 +73,9 @@ if selected_tab == "HR":
 
         elif buttons["submit2"] and uploaded_file is not None:
             with st.spinner("Generating response..."):  # Added progress bar
-                pdf_content = input_pdf_setup(uploaded_file)
+                pdf_text = input_pdf_setup(uploaded_file)
                 try:
-                    response = get_gemini_response(input_prompts["HR_Match"], pdf_content, input_text)
+                    response = get_gemini_response(input_prompts["HR_Match"], pdf_text, input_text)
                 except KeyError:
                     st.error("Prompt for 'Percentage Match' not found. Please check the code.")
                     return
@@ -132,9 +125,9 @@ if selected_tab == "Applicant":
     def show_response_app(buttons, input_prompts):
         if buttons["submit3"] and uploaded_file is not None:
             with st.spinner("Generating response..."):  # Added progress bar
-                pdf_content = input_pdf_setup(uploaded_file)
+                pdf_text = input_pdf_setup(uploaded_file)
                 try:
-                    response = get_gemini_response(input_prompts["APP_IMP"], pdf_content, input_text)
+                    response = get_gemini_response(input_prompts["APP_IMP"], pdf_text, input_text)
                 except KeyError:
                     st.error("Prompt for 'Improvement' not found. Please check the code.")
                     return
