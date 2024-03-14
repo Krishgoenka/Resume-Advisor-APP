@@ -89,13 +89,15 @@ if selected_tab == "HR":
     buttons_hr = display_buttons_hr()
     input_prompts = {
         "HR_Summary": """
-            You are an experienced Technical Human Resource Manager,your task is to review the provided resume against the job description if provided  and  compulsory give summary of the pdf. Please share your professional evaluation on whether the candidate's profile aligns with the role which is given in job description if any . Highlight the strengths and weaknesses of the applicant in relation to the specified job requirements.
+           You are an experienced Technical Human Resource Manager,your task is to review the provided pdf of  resume against the job description and give summary of the resume. 
+  if job description not given then dont compare with anything , just give summary of the resume.
+  if job description given then only tell Highlight the strengths and weaknesses of the applicant in relation to the specified job requirements.
         """,
         "HR_Match": """
             You are an skilled ATS (Applicant Tracking System) scanner with a deep understanding of data science and ATS functionality, 
-            your task is to evaluate the resume against the provided job description. Give me the percentage match if the resume matches
-            the job description. First, the output"""
-    }
+            your task is to evaluate the resume against the provided job description. Give me the percentage match in big fonts and bold if the resume matches
+            the job description. also write a small review """
+     }
     show_response_hr(buttons_hr, input_prompts)
                  
                  
@@ -140,8 +142,8 @@ if selected_tab == "Applicant":
     buttons_app = display_buttons_app()
     input_prompts = {
         "APP_IMP": """
-            You are an experienced technical human resource manager your task is to review the provided resume(PDF) againts the job desciption and  Tell what points to be improved by compairing the resume with job description only, what skills are missing, what should be the improvement. First mention what are the missing skills,
- and then what skills to be added in the resume, tell how to improve it."""
+            You are an experienced technical human resource manager your task is to review the provided resume(PDF) againts the job desciption and  Tell what points to be improved by compairing the resume with job description only, what skills are missing, what should be the improvement. 
+            First mention what are the missing skills and skills need to be added (in  rows and cloumns format) , there should be 2 columns 1st coloumn will be Missing Skills and 2nd will be Skill to be added(remember give this rows and columns) . then atlast give some recommendations """
         
     }
     show_response_app(buttons_app, input_prompts )
