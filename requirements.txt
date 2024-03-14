@@ -2,5 +2,4 @@ streamlit
 google-generativeai
 python-dotenv
 pdf2image
-poppler-utils==24.02.00
-
+poppler-utils==0.68.0
