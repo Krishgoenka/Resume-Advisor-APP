@@ -1,28 +1,27 @@
-from dotenv import load_dotenv
-load_dotenv()
-import base64
 import streamlit as st
 import os
 import io
-from PIL import Image 
+from PIL import Image
+from dotenv import load_dotenv
+load_dotenv()
+import base64
 import pdf2image
 import google.generativeai as genai
 
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-def get_gemini_response(input,pdf_cotent,prompt):
-    model=genai.GenerativeModel('gemini-pro-vision')
-    response=model.generate_content([input,pdf_content[0],prompt])
+
+def get_gemini_response(input_text, pdf_content, prompt):
+    model = genai.GenerativeModel('gemini-pro-vision')
+    response = model.generate_content([input_text, pdf_content[0], prompt])
     return response.text
+
 
 def input_pdf_setup(uploaded_file):
     if uploaded_file is not None:
-        ## Convert the PDF to image
-        images=pdf2image.convert_from_bytes(uploaded_file.read())
+        images = pdf2image.convert_from_bytes(uploaded_file.read())
+        first_page = images[0]
 
-        first_page=images[0]
-
-        # Convert to bytes
         img_byte_arr = io.BytesIO()
         first_page.save(img_byte_arr, format='JPEG')
         img_byte_arr = img_byte_arr.getvalue()
@@ -30,81 +29,130 @@ def input_pdf_setup(uploaded_file):
         pdf_parts = [
             {
                 "mime_type": "image/jpeg",
-                "data": base64.b64encode(img_byte_arr).decode()  # encode to base64
+                "data": base64.b64encode(img_byte_arr).decode()
             }
         ]
         return pdf_parts
     else:
         raise FileNotFoundError("No file uploaded")
 
-## Streamlit App
 
-st.set_page_config(page_title="Application Tracking System")
-st.header("Application Tracking System")
-input_text=st.text_area("Job Description: ",key="input")
-uploaded_file=st.file_uploader("Upload your resume(PDF)...",type=["pdf"])
+# Streamlit App Configuration
+st.set_page_config(page_title="Resume Advisor")
 
-
-if uploaded_file is not None:
-    st.write("PDF Uploaded Successfully")
+# Navigation Bar with Tabs
+navigation = st.sidebar.title("Select Role")
+navigation = st.header("RESUME ADVISOR")
+selected_tab = st.sidebar.radio("", ["HR", "Applicant"])
 
 
-submit1 = st.button("Tell Me About the Resume")
+## Content based on Selected Role
+if selected_tab == "HR":
+    st.header("HR - Resume Advisor")
+    input_text = st.text_area("Job Description:", key="input")
+    uploaded_file = st.file_uploader("Upload your Resume (PDF only):", type=["pdf"])
+
+    # Function to display success message and buttons for HR
+    def display_buttons_hr():
+        if uploaded_file is not None:
+            st.write("PDF Uploaded Successfully")
+
+        submit1 = st.button("Resume Summary")
+        submit2 = st.button("Percentage Match")
+        return {
+            "submit1": submit1,
+            "submit2": submit2
+        }
 
 
-submit2 = st.button("Percentage match")
+    # Function to display response based on button clicked for HR
+    def show_response_hr(buttons, input_prompts):
+        if buttons["submit1"] and uploaded_file is not None:
+            with st.spinner("Generating response..."):  # Added progress bar
+                pdf_content = input_pdf_setup(uploaded_file)
+                try:
+                    response = get_gemini_response(input_prompts["HR_Summary"], pdf_content, input_text)
+                except KeyError:
+                    st.error("Prompt for 'Resume Summary' not found. Please check the code.")
+                    return
+                st.subheader("The Response is")
+                st.write(response)
 
-submit3 = st.button("How can i improve my skills")
+        elif buttons["submit2"] and uploaded_file is not None:
+            with st.spinner("Generating response..."):  # Added progress bar
+                pdf_content = input_pdf_setup(uploaded_file)
+                try:
+                    response = get_gemini_response(input_prompts["HR_Match"], pdf_content, input_text)
+                except KeyError:
+                    st.error("Prompt for 'Percentage Match' not found. Please check the code.")
+                    return
+                st.subheader("The Response is")
+                st.write(response)
 
-input_prompt1 = """
- You are an experienced Technical Human Resource Manager,your task is to review the provided resume against the job description. 
-  Please share your professional evaluation on whether the candidate's profile aligns with the role. 
- Highlight the strengths and weaknesses of the applicant in relation to the specified job requirements.
-"""
+        else:
+            if uploaded_file is None:
+                st.write("Please upload the resume")
+
+    buttons_hr = display_buttons_hr()
+    input_prompts = {
+        "HR_Summary": """
+            You are an experienced Technical Human Resource Manager,your task is to review the provided resume against the job description. 
+            Please share your professional evaluation on whether the candidate's profile aligns with the role. 
+            Highlight the strengths and weaknesses of the applicant in relation to the specified job requirements.
+        """,
+        "HR_Match": """
+            You are an skilled ATS (Applicant Tracking System) scanner with a deep understanding of data science and ATS functionality, 
+            your task is to evaluate the resume against the provided job description. Give me the percentage match if the resume matches
+            the job description. First, the output"""
+    }
+    show_response_hr(buttons_hr, input_prompts)
+                 
+                 
+                 
+             #################------------------###############
 
 
-input_prompt2 = """
-You are an skilled ATS (Applicant Tracking System) scanner with a deep understanding of data science and ATS functionality, 
-your task is to evaluate the resume against the provided job description. give me the percentage of match if the resume matches
-the job description. First the output should come as percentage and then keywords missing and last final thoughts.
-"""
+if selected_tab == "Applicant":
+    st.header("Applicant - Resume Advisor")
+    input_text = st.text_area("Job Description:", key="input")
+    uploaded_file = st.file_uploader("Upload your Resume (PDF only):", type=["pdf"])
 
-input_prompt3 = """
- You are an experienced technical human resource manager your task is to review the provided resume(PDF) againts the job desciption and  Tell what points to be improved by compairing the resume with job description only, what skills are missing, what should be the improvement. First mention what are the missing skills,
- and then what skills to be added in the resume, tell how to improve it.
-"""
+    # Function to display success message and buttons for HR
+    def display_buttons_app():
+        if uploaded_file is not None:
+            st.write("PDF Uploaded Successfully")
 
-if submit1:
-    if uploaded_file is not None:
-        pdf_content=input_pdf_setup(uploaded_file)
-        response=get_gemini_response(input_prompt1,pdf_content,input_text)
-        st.subheader("The Repsonse is")
-        st.write(response)
-    else:
-        st.write("Please uplaod the resume")
+        submit3 = st.button("How to improve ")
+        return {
+            "submit3": submit3,
+        }
 
-elif submit2:
-    if uploaded_file is not None:
-        pdf_content=input_pdf_setup(uploaded_file)
-        response=get_gemini_response(input_prompt2,pdf_content,input_text)
-        st.subheader("The Repsonse is")
-        st.write(response)
+
+    # Function to display response based on button clicked for HR
+    def show_response_app(buttons, input_prompts):
+        if buttons["submit3"] and uploaded_file is not None:
+            with st.spinner("Generating response..."):  # Added progress bar
+                pdf_content = input_pdf_setup(uploaded_file)
+                try:
+                    response = get_gemini_response(input_prompts["APP_IMP"], pdf_content, input_text)
+                except KeyError:
+                    st.error("Prompt for 'Improvement' not found. Please check the code.")
+                    return
+                st.subheader("The Response is")
+                st.write(response)
+
         
-elif submit3:
-    if uploaded_file is not None:
-        pdf_content=input_pdf_setup(uploaded_file)
-        response=get_gemini_response(input_prompt3,pdf_content,input_text)
-        st.subheader("The Repsonse is")
-        st.write(response)        
+        else:
+            if uploaded_file is None:
+                st.write("Please upload the resume")
+
+    buttons_app = display_buttons_app()
+    input_prompts = {
+        "APP_IMP": """
+            You are an experienced technical human resource manager your task is to review the provided resume(PDF) againts the job desciption and  Tell what points to be improved by compairing the resume with job description only, what skills are missing, what should be the improvement. First mention what are the missing skills,
+ and then what skills to be added in the resume, tell how to improve it."""
         
-        
-    else:
-        st.write("Please uplaod the resume")
-
-
-
-   
-
-
+    }
+    show_response_app(buttons_app, input_prompts )
 
 
