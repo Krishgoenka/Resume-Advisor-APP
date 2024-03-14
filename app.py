@@ -89,9 +89,7 @@ if selected_tab == "HR":
     buttons_hr = display_buttons_hr()
     input_prompts = {
         "HR_Summary": """
-            You are an experienced Technical Human Resource Manager,your task is to review the provided resume against the job description. 
-            Please share your professional evaluation on whether the candidate's profile aligns with the role. 
-            Highlight the strengths and weaknesses of the applicant in relation to the specified job requirements.
+            You are an experienced Technical Human Resource Manager,your task is to review the provided resume against the job description if provided  and  compulsory give summary of the pdf. Please share your professional evaluation on whether the candidate's profile aligns with the role which is given in job description if any . Highlight the strengths and weaknesses of the applicant in relation to the specified job requirements.
         """,
         "HR_Match": """
             You are an skilled ATS (Applicant Tracking System) scanner with a deep understanding of data science and ATS functionality, 
