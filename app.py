@@ -1,3 +1,5 @@
+#FOR GDSC TIU HACKATHON#    
+
 import streamlit as st
 import os
 import io
@@ -16,7 +18,7 @@ def get_gemini_response(input_text, pdf_text, prompt):
     response = model.generate_content([input_text, pdf_text, prompt])
     return response.text
 
-
+#Input setup of pdf (Dhwani)
 def input_pdf_setup(uploaded_file):
   if uploaded_file is not None:
       pdf_reader = pdf.PdfReader(uploaded_file)
@@ -30,38 +32,43 @@ def input_pdf_setup(uploaded_file):
         raise FileNotFoundError("No file uploaded")
 
 
-# Streamlit App Configuration
+# app setup
 st.set_page_config(page_title="Resume Advisor")
 
 # Navigation Bar with Tabs
 navigation = st.sidebar.title("Select Role")
 navigation = st.header("RESUME ADVISOR")
 selected_tab = st.sidebar.radio("", ["HR", "Applicant"])
+ 
+     #-------------------------------------------------------------------#
+     
+     
 
+# Setup  for HR part (Krish)   
 
-## Content based on Selected Role
+#Select Role
 if selected_tab == "HR":
     st.header("HR - Resume Advisor")
+    st.markdown("Find your perfect match  for the job role.")
     input_text = st.text_area("Job Description:", key="input")
     uploaded_file = st.file_uploader("Upload your Resume (PDF only):", type=["pdf"])
 
-    # Function to display success message and buttons for HR
     def display_buttons_hr():
         if uploaded_file is not None:
             st.write("PDF Uploaded Successfully")
 
         submit1 = st.button("Resume Summary")
-        submit2 = st.button("Percentage Match")
+        submit2 = st.button("Percentage Match for job description")
         return {
             "submit1": submit1,
             "submit2": submit2
         }
+        
+        
 
-
-    # Function to display response based on button clicked for HR
     def show_response_hr(buttons, input_prompts):
         if buttons["submit1"] and uploaded_file is not None:
-            with st.spinner("Generating response..."):  # Added progress bar
+            with st.spinner("Generating response..."):  # Add progress bar
                 pdf_text = input_pdf_setup(uploaded_file)
                 try:
                     response = get_gemini_response(input_prompts["HR_Summary"], pdf_text, input_text)
@@ -102,11 +109,14 @@ if selected_tab == "HR":
                  
                  
                  
-             #################------------------###############
+             #------------------------------------------------------------#
 
 
+
+        #Applicant part setup (Shubhodeep)
 if selected_tab == "Applicant":
     st.header("Applicant - Resume Advisor")
+    st.markdown("Elevate your resume from ordinary to extraordinary with Resume Advisor's personalized tips.")
     input_text = st.text_area("Job Description:", key="input")
     uploaded_file = st.file_uploader("Upload your Resume (PDF only):", type=["pdf"])
 
@@ -115,7 +125,7 @@ if selected_tab == "Applicant":
         if uploaded_file is not None:
             st.write("PDF Uploaded Successfully")
 
-        submit3 = st.button("How to improve ")
+        submit3 = st.button("How to Enhance my resume ")
         return {
             "submit3": submit3,
         }
@@ -147,5 +157,11 @@ if selected_tab == "Applicant":
         
     }
     show_response_app(buttons_app, input_prompts )
+        #-----------------------------------------------------#
+        
+        
+footer_col1, footer_col2, footer_col3 = st.columns([1, 6, 1])
+with footer_col2:
+    st.write('Gemini AI powered Resume Advisor model  build for GDSC TIU HACKATHON')
 
 
