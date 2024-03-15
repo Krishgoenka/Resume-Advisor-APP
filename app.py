@@ -38,7 +38,7 @@ page_icon=":clipboard:", )
 # Navigation Bar with Tabs
 navigation = st.sidebar.title("Select Role")
 navigation = st.header("RESUME ADVISOR")
-selected_tab = st.sidebar.radio("", ["HR", "Applicant"])
+selected_tab = st.sidebar.selectbox("", ["HR", "Applicant"])
  
      #-------------------------------------------------------------------#
      
