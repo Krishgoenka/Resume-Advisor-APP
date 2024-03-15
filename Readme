@@ -1,4 +1,4 @@
-Resume Advisor*
+Resume Advisor
 
 Description:
 Resume Advisor is a cutting-edge platform developed to address the frustrations faced by job seekers due to the lack of feedback on their resumes. This innovative tool provides personalized insights into resume weaknesses, skill improvements, and crucial keywords for optimization, significantly enhancing job seekers' chances of success in the competitive job market.
@@ -34,4 +34,4 @@ Hackathon Project for Google Developer Student Club at Techno India University:
 "Resume Advisor" is our hackathon project built for the Google Developer Student Club at Techno India University, scheduled for March 16th, 2024.
 
 Streamlit Deployment:
-Our model is deployed using Streamlit. Access it [here](https://gdschackathon-u2mbyvry37oho6bgf4gx68.streamlit.app/).
+Our model is deployed using Streamlit. Access it https://gdschackathon-u2mbyvry37oho6bgf4gx68.streamlit.app/
