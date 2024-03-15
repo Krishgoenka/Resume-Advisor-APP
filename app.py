@@ -33,8 +33,8 @@ def input_pdf_setup(uploaded_file):
 
 
 # app setup
-st.set_page_config(page_title="Resume Advisor")
-
+st.set_page_config(page_title="Resume Advisor",
+page_icon=":clipboard:", )
 # Navigation Bar with Tabs
 navigation = st.sidebar.title("Select Role")
 navigation = st.header("RESUME ADVISOR")
