@@ -96,8 +96,8 @@ if selected_tab == "HR":
     buttons_hr = display_buttons_hr()
     input_prompts = {
         "HR_Summary": """
-           You are an experienced Technical Human Resource Manager,your task is to review the provided pdf of  resume against the job description and give summary of the resume. 
-  if job description not given then dont compare with anything , just give summary of the resume.
+           your task is to review the provided pdf of  resume against the job description and give summary of the resume. 
+  if job description not given then dont compare with anything , just give summary of the resume. Also provide any links mentioned in Resume , if any 
   if job description given then only tell Highlight the strengths and weaknesses of the applicant in relation to the specified job requirements.
         """,
         "HR_Match": """
