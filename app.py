@@ -162,6 +162,6 @@ if selected_tab == "Applicant":
         
 footer_col1, footer_col2, footer_col3 = st.columns([1, 6, 1])
 with footer_col2:
-    st.write('Gemini AI powered Resume Advisor model  build for GDSC TIU HACKATHON')
+    st.write('Gemini AI powered Resume Advisor model  build for EDUPRO ')
 
 
